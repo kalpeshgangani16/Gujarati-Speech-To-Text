@@ -11,7 +11,7 @@ model = whisper.load_model("large-v3")
 #     temperature=0.0
 # )
 result = model.transcribe(
-    "gujarati_sample.wav",
+    "live_audio.wav",
     language="gu",
     task="transcribe",
     fp16=False,
@@ -22,6 +22,13 @@ result = model.transcribe(
     initial_prompt="આ સ્પષ્ટ અને શુદ્ધ ગુજરાતી ભાષા છે."
 )
 
+# result = model.transcribe(
+#     "gujarati_voice.wav",
+#     language="gu",
+#     task="transcribe",
+#     fp16=False
+# )
+
 
 english_text = result["text"]
 
@@ -30,7 +37,7 @@ print("English Text:")
 print(english_text)
 
 # Write English text into file
-with open("output_english.txt", "w", encoding="utf-8") as f:
+with open("output_gujarati.txt", "w", encoding="utf-8") as f:
     f.write(english_text)
 
 print("\n✅ English text saved to output_english.txt")
