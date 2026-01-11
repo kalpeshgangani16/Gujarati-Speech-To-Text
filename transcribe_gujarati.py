@@ -10,6 +10,8 @@ model = whisper.load_model("large-v3")
 #     fp16=False,
 #     temperature=0.0
 # )
+
+
 result = model.transcribe(
     "live_audio.wav",
     language="gu",
@@ -19,7 +21,7 @@ result = model.transcribe(
     no_speech_threshold=0.6,
     logprob_threshold=-1.0,
     condition_on_previous_text=False,
-    initial_prompt="આ સ્પષ્ટ અને શુદ્ધ ગુજરાતી ભાષા છે."
+    # initial_prompt="આ સ્પષ્ટ અને શુદ્ધ ગુજરાતી ભાષા છે."
 )
 
 # result = model.transcribe(
