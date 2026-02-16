@@ -1,15 +1,31 @@
-import streamlit as st
-import whisper
+from flask import Flask, request, jsonify
+from transcribe_gujarati import transcribe_gujarati
+import os
 
-model = whisper.load_model("base")
+app = Flask(__name__)
 
-st.title("Gujarati Speech-to-Text")
+@app.route("/")
+def home():
+    return "Gujarati Speech-to-Text API is running"
 
-audio_file = st.file_uploader("Upload Gujarati Audio")
+@app.route("/transcribe", methods=["POST"])
+def transcribe():
+    print("➡️ Request received")
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
 
-if audio_file:
-    with open("temp.wav", "wb") as f:
-        f.write(audio_file.read())
+    audio = request.files["file"]
+    input_path = "input.wav"
+    audio.save(input_path)
 
-    result = model.transcribe("temp.wav", language="gu")
-    st.write(result["text"])
+    try:
+        text = transcribe_gujarati(input_path)
+    finally:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+    return jsonify({"text": text})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+

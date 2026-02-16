@@ -1,45 +1,42 @@
 import whisper
+from PreProcessing import reduce_noise
+import os
+import jiwer
+from ground_truth import GROUND_TRUTH_TEXT
 
-# Load model
+# Load model ONCE
 model = whisper.load_model("large-v3")
 
-# Transcribe + translate to English
-# result = model.transcribe(
-#     "live_audio.wav",
-#     task="translate",   # 🔥 THIS converts Gujarati → English
-#     fp16=False,
-#     temperature=0.0
-# )
+
+def calculate_wer(truth: str, hypothesis: str) -> float:
+    truth = truth.strip()
+    hypothesis = hypothesis.strip()
+    return jiwer.wer(truth, hypothesis)
 
 
-result = model.transcribe(
-    "live_audio.wav",
-    language="gu",
-    task="transcribe",
-    fp16=False,
-    temperature=0.0,
-    no_speech_threshold=0.6,
-    logprob_threshold=-1.0,
-    condition_on_previous_text=False,
-    # initial_prompt="આ સ્પષ્ટ અને શુદ્ધ ગુજરાતી ભાષા છે."
-)
+def transcribe_gujarati(input_audio_path: str) -> str:
+    clean_audio = "clean_audio.wav"
 
-# result = model.transcribe(
-#     "gujarati_voice.wav",
-#     language="gu",
-#     task="transcribe",
-#     fp16=False
-# )
+    reduce_noise(input_audio_path, clean_audio)
 
+    result = model.transcribe(
+        clean_audio,
+        language="gu",
+        task="transcribe",
+        fp16=False,
+        temperature=0.2,
+        no_speech_threshold=0.6,
+        logprob_threshold=-1.0,
+        condition_on_previous_text=False
+    )
 
-english_text = result["text"]
+    predicted_text = result["text"]
 
-# Print on screen
-print("English Text:")
-print(english_text)
+    if os.path.exists(clean_audio):
+        os.remove(clean_audio)
 
-# Write English text into file
-with open("output_gujarati.txt", "w", encoding="utf-8") as f:
-    f.write(english_text)
+    wer = calculate_wer(GROUND_TRUTH_TEXT, predicted_text)
 
-print("\n✅ English text saved to output_english.txt")
+    print(f"Transcription WER: {wer:.2%}")
+
+    return predicted_text
