@@ -4,7 +4,7 @@ import soundfile as sf
 
 
 def reduce_noise(input_audio, output_audio):
-    print("🧹 Preprocessing audio...")
+    # print("🧹 Preprocessing audio...")
 
 
     # Load audio
